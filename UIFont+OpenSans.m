@@ -21,20 +21,22 @@
     NSURL *fontURL = [bundle URLForResource:fontName withExtension:@"ttf"];
     NSData *fontData = [NSData dataWithContentsOfURL:fontURL];
 
-    CGDataProviderRef provider = CGDataProviderCreateWithCFData((CFDataRef)fontData);
-    CGFontRef font = CGFontCreateWithDataProvider(provider);
-
-    if (font) {
-        CFErrorRef error = NULL;
-        if (CTFontManagerRegisterGraphicsFont(font, &error) == NO) {
-            CFStringRef errorDescription = CFErrorCopyDescription(error);
-            @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:(__bridge NSString *)errorDescription userInfo:@{ NSUnderlyingErrorKey: (__bridge NSError *)error }];
+    if (fontData) {
+        CGDataProviderRef provider = CGDataProviderCreateWithCFData((CFDataRef)fontData);
+        CGFontRef font = CGFontCreateWithDataProvider(provider);
+        
+        if (font) {
+            CFErrorRef error = NULL;
+            if (CTFontManagerRegisterGraphicsFont(font, &error) == NO) {
+                CFStringRef errorDescription = CFErrorCopyDescription(error);
+                @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:(__bridge NSString *)errorDescription userInfo:@{ NSUnderlyingErrorKey: (__bridge NSError *)error }];
+            }
+            
+            CFRelease(font);
         }
         
-        CFRelease(font);
+        CFRelease(provider);
     }
-
-    CFRelease(provider);
 }
 
 @end
